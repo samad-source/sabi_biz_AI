@@ -4,94 +4,37 @@ import os
 MEMORY_FILE = "data/user_memory.json"
 
 
-def load_memory():
+# -----------------------------
+# LOAD USER MEMORY
+# -----------------------------
+def get_user(user_id: str):
     if not os.path.exists(MEMORY_FILE):
         return {}
 
     with open(MEMORY_FILE, "r") as f:
-        return json.load(f)
+        data = json.load(f)
+
+    return data.get(user_id, {})
 
 
-def save_memoimport json
-import os
+# -----------------------------
+# UPDATE USER MEMORY
+# -----------------------------
+def update_user(user_id: str, new_data: dict):
+    if os.path.exists(MEMORY_FILE):
+        with open(MEMORY_FILE, "r") as f:
+            data = json.load(f)
+    else:
+        data = {}
 
-MEMORY_FILE = "data/user_memory.json"
-
-
-def load_memory():
-    if not os.path.exists(MEMORY_FILE):
-        return {}
-
-    with open(MEMORY_FILE, "r") as f:
-        return json.load(f)
-
-
-def save_memory(memory):
-    os.makedirs(os.path.dirname(MEMORY_FILE), exist_ok=True)
+    data[user_id] = new_data
 
     with open(MEMORY_FILE, "w") as f:
-        json.dump(memory, f, indent=4)
+        json.dump(data, f, indent=2)
 
 
-def update_user(user_id: str, key: str, value):
-    memory = load_memory()
-
-    if user_id not in memory:
-        memory[user_id] = {
-            "preferences": {},
-            "personality": "neutral",
-            "history": []
-        }
-
-    memory[user_id][key] = value
-
-    memory[user_id]["history"].append({
-        "key": key,
-        "value": value
-    })
-
-    save_memory(memory)
-
-
-def get_user(user_id: str):
-    memory = load_memory()
-
-    return memory.get(user_id, {
-        "preferences": {},
-        "personality": "neutral",
-        "history": []
-    })ry(memory):
-    os.makedirs(os.path.dirname(MEMORY_FILE), exist_ok=True)
-
-    with open(MEMORY_FILE, "w") as f:
-        json.dump(memory, f, indent=4)
-
-
-def update_user(user_id: str, key: str, value):
-    memory = load_memory()
-
-    if user_id not in memory:
-        memory[user_id] = {
-            "preferences": {},
-            "personality": "neutral",
-            "history": []
-        }
-
-    memory[user_id][key] = value
-
-    memory[user_id]["history"].append({
-        "key": key,
-        "value": value
-    })
-
-    save_memory(memory)
-
-
-def get_user(user_id: str):
-    memory = load_memory()
-
-    return memory.get(user_id, {
-        "preferences": {},
-        "personality": "neutral",
-        "history": []
-    })
+# -----------------------------
+# SAVE MEMORY (alias safe)
+# -----------------------------
+def save_memory(user_id: str, new_data: dict):
+    update_user(user_id, new_data)
