@@ -1,19 +1,30 @@
 import os
-
 import pandas as pd
 from typing import Union, TypedDict
 
 from app.memory import update_user
 
-# Load sample dataset
+# -----------------------------------
+# SAFE DATA LOADING
+# -----------------------------------
 FILE_PATH = "data/reviews_sample.csv"
 
 if os.path.exists(FILE_PATH):
     df = pd.read_csv(FILE_PATH)
 else:
-    # fallback empty dataset (prevents crash)
-    df = pd.DataFrame(columns=["business_id", "stars"])
+    df = pd.DataFrame(columns=[
+        "user_id",
+        "business_id",
+        "stars",
+        "funny",
+        "useful",
+        "cool"
+    ])
 
+
+# -----------------------------------
+# USER PROFILE TYPE
+# -----------------------------------
 class UserProfile(TypedDict):
     total_reviews: int
     average_rating: float
@@ -25,31 +36,27 @@ class UserProfile(TypedDict):
     personality: str
 
 
+# -----------------------------------
+# BUILD USER PROFILE
+# -----------------------------------
 def build_user_profile(user_id: Union[int, str]) -> Union[UserProfile, str]:
 
-    # Get reviews from this user
+    if "user_id" not in df.columns:
+        return "Invalid dataset."
+
     user_reviews = df[df["user_id"] == user_id]
 
     if len(user_reviews) == 0:
         return "User not found."
 
-    average_rating = round(
-        float(user_reviews["stars"].mean()),
-        2
-    )
+    average_rating = round(float(user_reviews["stars"].mean()), 2)
 
-    profile_sentiment = "positive"
+    profile_sentiment = "positive" if average_rating >= 3 else "critical"
 
-    if average_rating < 3:
-        profile_sentiment = "critical"
-
-    # Personality logic
     if average_rating >= 4:
         personality = "positive reviewer"
-
     elif average_rating <= 2:
         personality = "critical reviewer"
-
     else:
         personality = "balanced reviewer"
 
@@ -68,7 +75,7 @@ def build_user_profile(user_id: Union[int, str]) -> Union[UserProfile, str]:
 
 
 # -----------------------------------
-# MAIN FUNCTION FOR AGENT SYSTEM
+# MAIN AGENT FUNCTION
 # -----------------------------------
 def analyze_user(user_id: str):
 
@@ -77,20 +84,11 @@ def analyze_user(user_id: str):
     if isinstance(profile, str):
         return None
 
-    # Save memory
-    update_user(
-        user_id,
-        {
-            "avg_rating": profile["average_rating"],
-            "personality": profile["personality"]
-        }
-    )
-
-    update_user(
-        user_id,
-        "personality",
-        profile["personality"]
-    )
+    # SAFE MEMORY UPDATE (FIXED)
+    update_user(user_id, {
+        "avg_rating": profile["average_rating"],
+        "personality": profile["personality"]
+    })
 
     return {
         "total_reviews": profile["total_reviews"],
@@ -107,11 +105,9 @@ def analyze_user(user_id: str):
 # TEST RUN
 # -----------------------------------
 if __name__ == "__main__":
-
-    sample_user = str(df.iloc[0]["user_id"])
-
-    print("Sample User:", sample_user)
-
-    result = analyze_user(sample_user)
-
-    print(result)
+    if len(df) > 0:
+        sample_user = str(df.iloc[0]["user_id"])
+        print("Sample User:", sample_user)
+        print(analyze_user(sample_user))
+    else:
+        print("Empty dataset - safe mode")

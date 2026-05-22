@@ -81,3 +81,15 @@ def recommend_businesses_personalized(query: str, user_id: str, top_n: int = 5):
         }
         for biz_id, score in ranked[:top_n]
     ]
+    
+def extract_query_entities(query: str):
+    """
+    Safe fallback entity extractor for deployment.
+    Keeps system stable even without NLP model.
+    """
+    return {
+        "query": query,
+        "entities": [],
+        "city": None,
+        "category": None
+    }
