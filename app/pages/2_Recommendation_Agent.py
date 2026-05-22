@@ -71,9 +71,10 @@ query = st.text_input(
 
 if st.button("🔍 Find Businesses"):
 
-    results = recommend_from_query(
-        query
-    )
+    results = recommend_from_query(query)
+
+if results.empty:
+    st.warning("No data available")
 
     if len(results) == 0:
 
