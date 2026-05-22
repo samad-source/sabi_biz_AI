@@ -5,7 +5,7 @@ MEMORY_FILE = "data/user_memory.json"
 
 
 # -----------------------------
-# LOAD USER MEMORY
+# GET USER DATA
 # -----------------------------
 def get_user(user_id: str):
     if not os.path.exists(MEMORY_FILE):
@@ -18,7 +18,7 @@ def get_user(user_id: str):
 
 
 # -----------------------------
-# UPDATE USER MEMORY
+# UPDATE USER DATA
 # -----------------------------
 def update_user(user_id: str, new_data: dict):
     if os.path.exists(MEMORY_FILE):
@@ -34,7 +34,7 @@ def update_user(user_id: str, new_data: dict):
 
 
 # -----------------------------
-# SAVE MEMORY (alias safe)
+# SAVE MEMORY (SAFE WRAPPER)
 # -----------------------------
 def save_memory(user_id: str, new_data: dict):
     update_user(user_id, new_data)
