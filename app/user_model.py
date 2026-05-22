@@ -1,11 +1,18 @@
+import os
+
 import pandas as pd
 from typing import Union, TypedDict
 
 from app.memory import update_user
 
 # Load sample dataset
-df = pd.read_csv("data/reviews_sample.csv")
+FILE_PATH = "data/reviews_sample.csv"
 
+if os.path.exists(FILE_PATH):
+    df = pd.read_csv(FILE_PATH)
+else:
+    # fallback empty dataset (prevents crash)
+    df = pd.DataFrame(columns=["business_id", "stars"])
 
 class UserProfile(TypedDict):
     total_reviews: int
@@ -73,8 +80,10 @@ def analyze_user(user_id: str):
     # Save memory
     update_user(
         user_id,
-        "avg_rating",
-        profile["average_rating"]
+        {
+            "avg_rating": profile["average_rating"],
+            "personality": profile["personality"]
+        }
     )
 
     update_user(
