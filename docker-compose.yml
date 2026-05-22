@@ -1,0 +1,31 @@
+services:
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+    restart: always
+
+  telegram:
+    build: .
+    command: python app/telegram_bot.py
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+    restart: always
+
+  dashboard:
+    build: .
+    command: streamlit run app/dashboard.py
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+    restart: always
