@@ -33,12 +33,12 @@ st.markdown(
         background-color: #0E1117;
     }
 
-    .stButton>button {
-        width: 100%;
-        border-radius: 10px;
-        height: 3em;
-        font-size: 18px;
-        font-weight: bold;
+    .stButton > button {
+        width:100%;
+        border-radius:10px;
+        height:3em;
+        font-size:18px;
+        font-weight:bold;
     }
 
     </style>
@@ -66,104 +66,128 @@ query = st.text_input(
 )
 
 # -----------------------------------
-# BUTTON
+# BUTTON ACTION
 # -----------------------------------
 
 if st.button("🔍 Find Businesses"):
 
-    results = recommend_from_query(query)
+    # Empty search handling
+    if query.strip() == "":
 
-if results.empty:
-    st.warning("No data available")
-
-    if len(results) == 0:
-
-        st.error(
-            "No businesses found."
+        st.warning(
+            "Please enter a search query."
         )
 
     else:
 
-        st.success(
-            f"{len(results)} recommendations found"
-        )
+        results = recommend_from_query(query)
 
         # -----------------------------------
-        # LOOP THROUGH RESULTS
+        # NO RESULTS
         # -----------------------------------
 
-        for _, row in results.iterrows():
+        if results is None or len(results) == 0:
 
-            st.divider()
+            st.error(
+                "❌ No businesses found."
+            )
 
-            col1, col2 = st.columns([1, 2])
+        else:
+
+            st.success(
+                f"✅ {len(results)} recommendations found"
+            )
 
             # -----------------------------------
-            # IMAGE
+            # LOOP THROUGH RESULTS
             # -----------------------------------
 
-            with col1:
+            for _, row in results.iterrows():
 
-                image = get_business_image(
-                    row["name"]
-                )
+                st.divider()
 
-                if image:
+                col1, col2 = st.columns([1,2])
 
-                    st.image(
-                        image,
-                        use_container_width=True
+                # ---------------------------
+                # IMAGE COLUMN
+                # ---------------------------
+
+                with col1:
+
+                    try:
+
+                        image = get_business_image(
+                            row["name"]
+                        )
+
+                        if image:
+
+                            st.image(
+                                image,
+                                use_container_width=True
+                            )
+
+                    except:
+
+                        pass
+
+                # ---------------------------
+                # INFO COLUMN
+                # ---------------------------
+
+                with col2:
+
+                    st.subheader(
+                        row["name"]
                     )
 
-            # -----------------------------------
-            # BUSINESS DETAILS
-            # -----------------------------------
-
-            with col2:
-
-                st.subheader(
-                    row["name"]
-                )
-
-                st.write(
-                    f"⭐ Rating: {row['stars']}"
-                )
-
-                st.write(
-                    f"📍 City: {row['city']}"
-                )
-
-                st.write(
-                    f"📝 Reviews: {row['review_count']}"
-                )
-
-                st.write(
-                    f"🏷️ {row['categories']}"
-                )
-
-                # -----------------------------------
-                # AI INSIGHT
-                # -----------------------------------
-
-                insight = (
-                    generate_business_explanation(
-                        row
+                    st.write(
+                        f"⭐ Rating: {row['stars']}"
                     )
-                )
 
-                st.info(
-                    f"🤖 AI Insight:\n\n{insight}"
-                )
+                    st.write(
+                        f"📍 City: {row['city']}"
+                    )
 
-                # -----------------------------------
-                # MAPS LINK
-                # -----------------------------------
+                    st.write(
+                        f"📝 Reviews: {row['review_count']}"
+                    )
 
-                maps_url = (
-                    f"https://www.google.com/maps/search/"
-                    f"{row['name']} {row['city']}"
-                )
+                    st.write(
+                        f"🏷️ Categories: {row['categories']}"
+                    )
 
-                st.markdown(
-                    f"[📍 Open in Maps]({maps_url})"
-                )
+                    # -----------------------
+                    # AI INSIGHT
+                    # -----------------------
+
+                    try:
+
+                        insight = (
+                            generate_business_explanation(
+                                row
+                            )
+                        )
+
+                        st.info(
+                            f"🤖 AI Insight:\n\n{insight}"
+                        )
+
+                    except:
+
+                        st.info(
+                            "AI explanation unavailable."
+                        )
+
+                    # -----------------------
+                    # MAP LINK
+                    # -----------------------
+
+                    maps_url = (
+                        f"https://www.google.com/maps/search/"
+                        f"{row['name']} {row['city']}"
+                    )
+
+                    st.markdown(
+                        f"[📍 Open in Google Maps]({maps_url})"
+                    )
