@@ -1,53 +1,51 @@
 import pandas as pd
 import os
 
-from app.query_understanding import extract_query_entities
+DATA = "data/businesses_small.csv"
 
-
-# SAFE LOAD
-if os.path.exists("data/businesses_small.csv"):
-
-    business_df = pd.read_csv(
-        "data/businesses_small.csv"
-    )
-
+if os.path.exists(DATA):
+    business_df = pd.read_csv(DATA)
 else:
+    business_df = pd.DataFrame()
 
-    business_df = pd.DataFrame({
-        "name":["Demo Restaurant"],
-        "city":["Lagos"],
-        "categories":["Restaurant"],
-        "stars":[5],
-        "review_count":[100]
-    })
+business_df = business_df.fillna("")
 
 
 def recommend_from_query(query, top_n=5):
 
-    entities = extract_query_entities(query)
+    if business_df.empty:
+        return pd.DataFrame()
 
-    city = entities.get("city")
+    query = query.lower()
 
-    cuisine = entities.get("cuisine")
+    filtered = business_df[
+        business_df["name"].str.lower().str.contains(query)
+        |
+        business_df["categories"].str.lower().str.contains(query)
+        |
+        business_df["city"].str.lower().str.contains(query)
+    ]
 
-    filtered = business_df.copy()
+    if filtered.empty:
 
-    if city:
+        words = query.split()
 
-        filtered = filtered[
-            filtered["city"]
-            .str.contains(city,
-            case=False,
-            na=False)
-        ]
+        for word in words:
 
-    if cuisine:
+            filtered = business_df[
+                business_df["name"].str.lower().str.contains(word)
+                |
+                business_df["categories"].str.lower().str.contains(word)
+                |
+                business_df["city"].str.lower().str.contains(word)
+            ]
 
-        filtered = filtered[
-            filtered["categories"]
-            .str.contains(cuisine,
-            case=False,
-            na=False)
-        ]
+            if not filtered.empty:
+                break
+
+    filtered = filtered.sort_values(
+        by=["stars","review_count"],
+        ascending=False
+    )
 
     return filtered.head(top_n)
