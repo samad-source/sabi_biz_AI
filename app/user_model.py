@@ -7,7 +7,7 @@ from app.memory import update_user
 # -----------------------------------
 # SAFE DATA LOADING
 # -----------------------------------
-FILE_PATH = "data/reviews_sample.csv"
+FILE_PATH = "data/reviews_small.csv"
 
 if os.path.exists(FILE_PATH):
     df = pd.read_csv(FILE_PATH)

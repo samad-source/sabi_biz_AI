@@ -33,9 +33,9 @@ if not business_df.empty:
         ]
     ].dropna()
 
-    business_df.to_csv("data/businesses.csv", index=False)
+    business_df.to_csv("data/businesses_small.csv", index=False)
 
-    print("✅ businesses.csv created successfully!")
+    print("✅ businesses_small.csv created successfully!")
 
     print("\nColumns:\n", business_df.columns)
 

@@ -5,10 +5,10 @@ from app.query_understanding import extract_query_entities
 
 
 # SAFE LOAD
-if os.path.exists("data/businesses.csv"):
+if os.path.exists("data/businesses_small.csv"):
 
     business_df = pd.read_csv(
-        "data/businesses.csv"
+        "data/businesses_small.csv"
     )
 
 else:

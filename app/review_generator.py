@@ -15,7 +15,7 @@ client = Groq(
 
 # Load dataset safely
 try:
-    df = pd.read_csv("data/reviews_sample.csv")
+    df = pd.read_csv("data/reviews_small.csv")
 except Exception:
     df = pd.DataFrame()
 

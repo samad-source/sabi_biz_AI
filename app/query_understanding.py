@@ -6,12 +6,12 @@ from app.memory import get_user
 # SAFE DATA LOADING (OPTION 2 FIX)
 # -----------------------------------
 
-file_path = "data/reviews_sample.csv"
+file_path = "data/reviews_small.csv"
 
 if os.path.exists(file_path):
     df = pd.read_csv(file_path)
 else:
-    print("⚠️ reviews_sample.csv not found — running fallback mode")
+    print("⚠️ reviews_small.csv not found — running fallback mode")
     df = pd.DataFrame(columns=["business_id", "stars"])
 
 

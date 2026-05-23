@@ -10,8 +10,10 @@ from app.review_generator import generate_review
 # SAFE DATA LOADING
 # ---------------------------
 
-if os.path.exists("data/reviews_sample.csv"):
-    df = pd.read_csv("data/reviews_sample.csv")
+if os.path.exists("data/reviews_small.csv"):
+    df = pd.read_csv(
+    "data/reviews_small.csv"
+)
 else:
     df = pd.DataFrame({
         "user_id":[1],
@@ -23,8 +25,10 @@ else:
         "cool":[0]
     })
 
-if os.path.exists("data/businesses.csv"):
-    business_df = pd.read_csv("data/businesses.csv")
+if os.path.exists("data/businesses_small.csv"):
+    business_df = pd.read_csv(
+    "data/businesses_small.csv"
+)
 else:
     business_df = pd.DataFrame({
         "business_id":["demo"],
