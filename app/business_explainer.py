@@ -1,59 +1,83 @@
-def generate_business_explanation(row):
+import os
+from groq import Groq
 
-    import random
+# -----------------------------------
+# INIT GROQ CLIENT
+# -----------------------------------
+
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+
+# -----------------------------------
+# BUSINESS INSIGHT GENERATOR
+# -----------------------------------
+
+def generate_business_explanation(row):
 
     name = row["name"]
     stars = row["stars"]
     reviews = row["review_count"]
     categories = str(row["categories"])
+    city = row.get("city", "unknown location")
 
-    if "African" in categories:
-        cuisine = "African cuisine"
-    elif "Italian" in categories:
-        cuisine = "Italian food"
-    elif "Pizza" in categories:
-        cuisine = "pizza spots"
-    elif "Coffee" in categories or "Cafe" in categories:
-        cuisine = "cafes and coffee"
-    else:
-        cuisine = "restaurant experiences"
+    # -----------------------------------
+    # STRUCTURED PROMPT (IMPORTANT FIX)
+    # -----------------------------------
 
-    if reviews > 300:
-        popularity = "very popular among customers"
-    elif reviews > 100:
-        popularity = "well-reviewed by many customers"
-    else:
-        popularity = "a hidden gem with loyal customers"
+    prompt = f"""
+You are a senior business intelligence analyst.
 
-    if stars >= 4.5:
-        sentiment = "Customers highly praise the experience."
-    elif stars >= 4:
-        sentiment = "Most customers leave satisfied reviews."
-    else:
-        sentiment = "Reviews are mixed depending on expectations."
+Generate a UNIQUE, NON-REPETITIVE insight for this business.
 
-    intro_templates = [
-        f"{name} specializes in {cuisine}.",
-        f"You’ll find {cuisine} at {name}.",
-        f"{name} offers a strong focus on {cuisine}."
-    ]
+Do NOT reuse sentence structures from previous responses.
+Do NOT sound generic or templated.
 
-    popularity_templates = [
-        f"It is {popularity}.",
-        f"This place is considered {popularity}.",
-        f"Locals describe it as {popularity}."
-    ]
+BUSINESS INFORMATION:
+Name: {name}
+Category: {categories}
+Location: {city}
+Rating: {stars}
+Number of Reviews: {reviews}
 
-    sentiment_templates = [
-        sentiment,
-        f"In general, {sentiment.lower()}",
-        f"Overall, customers say that {sentiment.lower()}"
-    ]
+ANALYSIS TASK:
+Write 3–5 sentences covering:
 
-    explanation = " ".join([
-        random.choice(intro_templates),
-        random.choice(popularity_templates),
-        random.choice(sentiment_templates)
-    ])
+1. What this business is likely best known for
+2. What its rating and review count suggest about real customer experience
+3. What type of customers it attracts
+4. One unique business insight or interpretation (very important)
 
-    return explanation
+STYLE:
+- Human-like writing
+- Analytical tone
+- Specific to this business only
+- No repetition
+- No filler phrases like "this business offers"
+
+OUTPUT:
+"""
+
+    # -----------------------------------
+    # GROQ API CALL
+    # -----------------------------------
+
+    response = client.chat.completions.create(
+        model="llama3-70b-8192",  # you can switch to llama3-8b-8192 for speed
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are an expert business analyst. "
+                    "You write sharp, non-repetitive, insightful business reports."
+                )
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.9,
+        max_tokens=220
+    )
+
+    return response.choices[0].message.content
